@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{5E9E78A0-531B-11CF-91F6-C2863C385E30}#1.0#0"; "MSFLXGRD.OCX"
 Begin VB.Form kyria 
    BackColor       =   &H00008080&
@@ -10,9 +10,41 @@ Begin VB.Form kyria
    ClientWidth     =   17820
    LinkTopic       =   "Form1"
    PaletteMode     =   1  'UseZOrder
-   ScaleHeight     =   11535
-   ScaleWidth      =   17820
+   ScaleHeight     =   17535
+   ScaleWidth      =   28680
    WindowState     =   2  'Maximized
+   Begin VB.TextBox externHD 
+      Height          =   375
+      Left            =   16440
+      TabIndex        =   30
+      Text            =   "H:"
+      Top             =   960
+      Width           =   615
+   End
+   Begin VB.ListBox List2 
+      Height          =   11760
+      Left            =   13440
+      TabIndex        =   29
+      Top             =   1560
+      Visible         =   0   'False
+      Width           =   4455
+   End
+   Begin VB.CommandButton cmdMoveRecent 
+      Caption         =   "Move Recent Files to External Disk"
+      Height          =   360
+      Left            =   13320
+      TabIndex        =   28
+      Top             =   960
+      Width           =   3015
+   End
+   Begin VB.CommandButton cmdMOVETO 
+      Caption         =   "MOVE TO FOLDER"
+      Height          =   360
+      Left            =   13320
+      TabIndex        =   27
+      Top             =   360
+      Width           =   3015
+   End
    Begin VB.CommandButton MetakPalion 
       BackColor       =   &H008080FF&
       Caption         =   "ΜΕΤΑΚΙΝΗΣΗ ΠΑΛΙΩΝ ΣΕ FTPSOLD"
@@ -347,6 +379,148 @@ ERR:
   MsgBox "Problem occurer during the transfer " + file
 End Function
 
+
+Private Sub cmdMoveRecent_Click()
+List2.Visible = True
+DoEvents
+Dim ExtHD As String
+
+Dim k, l As Integer
+Dim d As String
+Dim w As String
+ExtHD = Trim(externHD.Text) ' "H:"
+On Error Resume Next
+Dim onoma As String
+'για ολα τα  αρχεια που με ενδιαφερουν
+For k = 0 To List1.ListCount - 1
+    
+    
+    
+ 
+    
+    
+    
+    onoma = Split(List1.List(k), ";")(0)
+    d = Split(List1.List(k), ";")(1)
+    w = Split(List1.List(k), ";")(2)
+    
+    Dim TargetFolder As String
+    TargetFolder = Trim(Replace$(d, Left$(d, 2), ExtHD))
+    
+    
+    CreateFolderToExternalHD TargetFolder
+    
+        taxinomisi d, w
+        
+    If Left$(onoma, 1) = "*" Then
+    Else
+          DoEvents
+        If Dir(TargetFolder + "\" + ListView1.ListItems(1), vbDirectory) <> "" Then
+          ' Already exists.'
+        Else
+            FileCopy Trim(d) + "\" + ListView1.ListItems(1), TargetFolder + "\" + ListView1.ListItems(1)
+        End If
+         DoEvents
+        
+        
+         If Dir(TargetFolder + "\" + ListView1.ListItems(2), vbDirectory) <> "" Then
+          ' Already exists.'
+         Else
+            FileCopy Trim(d) + "\" + ListView1.ListItems(2), TargetFolder + "\" + ListView1.ListItems(2)
+         End If
+         
+        
+        
+        DoEvents
+        List2.AddItem Trim(d), 0
+        Me.Caption = Str(k) + "// " + d
+        
+    End If
+    
+      List2.AddItem "---οκ---", 0
+
+Next
+
+
+
+
+
+End Sub
+
+
+Sub CreateFolderToExternalHD(ByVal DIREC As String)
+
+
+ Dim mOld As String
+
+mOld = DIREC  ' Replace(UCase(f_CurDir), "\FTPS\", "\FTPSOLD\")
+
+
+ Dim d3() As String
+  
+   d3 = Split(mOld, "\")
+
+
+
+
+
+
+Dim C3 As String
+
+
+    If Dir(mOld, vbDirectory) <> "" Then
+        ' Already exists.'
+    Else
+    
+        
+    
+    
+        'We have to create it'
+        On Error Resume Next
+        Dim L3 As Integer
+        C3 = d3(0) + "\" + d3(1)
+        For L3 = 2 To UBound(d3)
+           C3 = C3 + "\" + d3(L3)
+             If Dir(C3, vbDirectory) <> "" Then
+                   ' Already exists.'
+             Else
+                   MkDir C3
+             End If
+        
+        Next
+        
+        
+       
+    End If
+
+
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Private Sub cmdMOVETO_Click()
+
+Shell "EXPLORER.EXE /e , " + f_CurDir, vbNormalFocus
+
+
+
+
+
+
+End Sub
 
 'Private Sub Command1_Click()
 
@@ -696,7 +870,7 @@ On Error GoTo LATOS
 
 Dim d() As String
 Dim k As Integer
-Dim L As Integer, nl As Integer
+Dim l As Integer, nl As Integer
 Dim maxSize As Single
 
 Dim mess(10) As String
@@ -740,8 +914,8 @@ For k = 0 To List1.ListCount - 1
     
     problem = False
     nl = 0
-    For L = 1 To 10
-       mess(L) = ""
+    For l = 1 To 10
+       mess(l) = ""
     Next
     
     
@@ -760,10 +934,10 @@ For k = 0 To List1.ListCount - 1
  
     'βρισκω το μέγιστο μέγεθος του αρχείου
     maxSize = 0
-    For L = 1 To ListView1.ListItems.Count
+    For l = 1 To ListView1.ListItems.Count
     
-      If Val(Replace(ListView1.ListItems(L).SubItems(3), ",", ".")) > maxSize Then
-        maxSize = Val(Replace(ListView1.ListItems(L).SubItems(3), ",", "."))
+      If Val(Replace(ListView1.ListItems(l).SubItems(3), ",", ".")) > maxSize Then
+        maxSize = Val(Replace(ListView1.ListItems(l).SubItems(3), ",", "."))
       End If
     
     Next
@@ -873,9 +1047,9 @@ For k = 0 To List1.ListCount - 1
        
        
        
-       For L = 1 To nl
+       For l = 1 To nl
          row = row + 1
-        d = Split(mess(L), ";")
+        d = Split(mess(l), ";")
 '        Set itmx = log.ListItems.Add(, , d(0))
 '        itmx.SubItems(1) = d(1)
 '        itmx.SubItems(2) = d(2)
@@ -1214,7 +1388,7 @@ On Error Resume Next
 
 Dim d() As String
 Dim k As Integer
-Dim L As Integer, nl As Integer
+Dim l As Integer, nl As Integer
 Dim maxSize As Single
 
 Dim mess(10) As String
@@ -1249,8 +1423,8 @@ Dim row As Integer
     k = 0
     problem = False
     nl = 0
-    For L = 1 To 10
-       mess(L) = ""
+    For l = 1 To 10
+       mess(l) = ""
     Next
     
     
@@ -1259,15 +1433,15 @@ Dim row As Integer
     maxSize = 0
     log.Clear
     nl = 0
-    For L = 1 To ListView1.ListItems.Count
-         C = ListView1.ListItems(L).SubItems(2)
+    For l = 1 To ListView1.ListItems.Count
+         C = ListView1.ListItems(l).SubItems(2)
          If DateDiff("D", CDate(C), Now) > 60 Then
                  d = Split(List1.Text, ";")
                  'taxinomisi d(1), d(2)
                  problem = True
                  nl = nl + 1
-                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(L)
-                 log.TextMatrix(nl, 3) = ListView1.ListItems(L).SubItems(2)
+                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(l)
+                 log.TextMatrix(nl, 3) = ListView1.ListItems(l).SubItems(2)
          End If
     Next
     
@@ -1275,13 +1449,13 @@ Dim row As Integer
     ANS = MsgBox("Να διαγραφούν τα παλιά που φαίνονται δεξιά;", vbYesNo)
     
     If ANS = vbYes Then
-      For L = 1 To ListView1.ListItems.Count
-         C = ListView1.ListItems(L).SubItems(2)
+      For l = 1 To ListView1.ListItems.Count
+         C = ListView1.ListItems(l).SubItems(2)
          If DateDiff("D", CDate(C), Now) > 60 Then
                  d = Split(List1.Text, ";")
                  
                  nl = nl + 1
-                 Kill d(1) + "\" + ListView1.ListItems(L)
+                 Kill d(1) + "\" + ListView1.ListItems(l)
                  
          End If
       Next
@@ -1483,7 +1657,7 @@ On Error Resume Next
 
 Dim d() As String
 Dim k As Integer
-Dim L As Integer, nl As Integer
+Dim l As Integer, nl As Integer
 Dim maxSize As Single
 
 Dim mess(10) As String
@@ -1518,8 +1692,8 @@ Dim row As Integer
     k = 0
     problem = False
     nl = 0
-    For L = 1 To 10
-       mess(L) = ""
+    For l = 1 To 10
+       mess(l) = ""
     Next
     
     
@@ -1529,10 +1703,10 @@ Dim row As Integer
     
     
  'βρισκω το μέγιστο μέγεθος του αρχείου
-    For L = 1 To ListView1.ListItems.Count
+    For l = 1 To ListView1.ListItems.Count
     
-      If Val(Replace(ListView1.ListItems(L).SubItems(3), ",", ".")) > maxSize Then
-        maxSize = Val(Replace(ListView1.ListItems(L).SubItems(3), ",", "."))
+      If Val(Replace(ListView1.ListItems(l).SubItems(3), ",", ".")) > maxSize Then
+        maxSize = Val(Replace(ListView1.ListItems(l).SubItems(3), ",", "."))
       End If
     
     Next
@@ -1554,15 +1728,15 @@ Dim row As Integer
     
     
     nl = 0
-    For L = 1 To ListView1.ListItems.Count
+    For l = 1 To ListView1.ListItems.Count
          'C = ListView1.ListItems(l).SubItems(3)
-         If Val(Replace(ListView1.ListItems(L).SubItems(3), ",", ".")) < maxSize * 0.8 Then
+         If Val(Replace(ListView1.ListItems(l).SubItems(3), ",", ".")) < maxSize * 0.8 Then
                  d = Split(List1.Text, ";")
                  'taxinomisi d(1), d(2)
                  problem = True
                  nl = nl + 1
-                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(L)
-                 log.TextMatrix(nl, 3) = ListView1.ListItems(L).SubItems(2)
+                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(l)
+                 log.TextMatrix(nl, 3) = ListView1.ListItems(l).SubItems(2)
          End If
     Next
     
@@ -1583,13 +1757,13 @@ Dim row As Integer
     
     
     If ANS = vbYes Then
-      For L = 1 To ListView1.ListItems.Count
+      For l = 1 To ListView1.ListItems.Count
          'C = ListView1.ListItems(l).SubItems(2)
-         If Val(Replace(ListView1.ListItems(L).SubItems(3), ",", ".")) < maxSize * 0.8 Then
+         If Val(Replace(ListView1.ListItems(l).SubItems(3), ",", ".")) < maxSize * 0.8 Then
                  d = Split(List1.Text, ";")
                  
                  nl = nl + 1
-                 Name d(1) + "\" + ListView1.ListItems(L) As d(1) + "\mikra\" + ListView1.ListItems(L)
+                 Name d(1) + "\" + ListView1.ListItems(l) As d(1) + "\mikra\" + ListView1.ListItems(l)
                  
          End If
       Next
@@ -1621,7 +1795,7 @@ Dim C3 As String
 
 Dim d() As String
 Dim k As Integer
-Dim L As Integer, nl As Integer
+Dim l As Integer, nl As Integer
 Dim maxSize As Single
 
 Dim mess(10) As String
@@ -1661,7 +1835,7 @@ mOld = Replace(UCase(f_CurDir), "\FTPS\", "\FTPSOLD\")
 
 
 
-
+' DHMIOYRGV TOYS KATALOGOYS AN DEN YPARXOYN
     If Dir(mOld, vbDirectory) <> "" Then
         ' Already exists.'
     Else
@@ -1707,8 +1881,8 @@ Dim row As Integer
     k = 0
     problem = False
     nl = 0
-    For L = 1 To 10
-       mess(L) = ""
+    For l = 1 To 10
+       mess(l) = ""
     Next
     
     
@@ -1717,15 +1891,15 @@ Dim row As Integer
     maxSize = 0
     log.Clear
     nl = 0
-    For L = 1 To ListView1.ListItems.Count
-         C = ListView1.ListItems(L).SubItems(2)
+    For l = 1 To ListView1.ListItems.Count
+         C = ListView1.ListItems(l).SubItems(2)
          If DateDiff("D", CDate(C), Now) > 60 Then
                  d = Split(List1.Text, ";")
                  'taxinomisi d(1), d(2)
                  problem = True
                  nl = nl + 1
-                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(L)
-                 log.TextMatrix(nl, 3) = ListView1.ListItems(L).SubItems(2)
+                 log.TextMatrix(nl, 0) = d(1) + "\" + ListView1.ListItems(l)
+                 log.TextMatrix(nl, 3) = ListView1.ListItems(l).SubItems(2)
          End If
     Next
     
@@ -1733,16 +1907,16 @@ Dim row As Integer
     ANS = MsgBox("Να METAKINΗΘOYN τα παλιά που φαίνονται δεξιά;", vbYesNo)
     
     If ANS = vbYes Then
-      For L = 1 To ListView1.ListItems.Count
-         C = ListView1.ListItems(L).SubItems(2)
+      For l = 1 To ListView1.ListItems.Count
+         C = ListView1.ListItems(l).SubItems(2)
          If DateDiff("D", CDate(C), Now) > 60 Then
                  d = Split(List1.Text, ";")
                  
                  nl = nl + 1
                  On Error GoTo 0
-                  Name Trim(d(1)) + "\" + ListView1.ListItems(L) As mOld + "\" + ListView1.ListItems(L)
-                  Me.Caption = ListView1.ListItems(L)
-                    If Dir(mOld + "\" + ListView1.ListItems(L), vbDirectory) <> "" Then
+                  Name Trim(d(1)) + "\" + ListView1.ListItems(l) As mOld + "\" + ListView1.ListItems(l)
+                  Me.Caption = ListView1.ListItems(l)
+                    If Dir(mOld + "\" + ListView1.ListItems(l), vbDirectory) <> "" Then
                             ' Already exists.'
                            '  Kill Trim(d(1)) + "\" + ListView1.ListItems(L)
                    Else
