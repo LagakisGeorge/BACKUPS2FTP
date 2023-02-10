@@ -10,9 +10,17 @@ Begin VB.Form kyria
    ClientWidth     =   17820
    LinkTopic       =   "Form1"
    PaletteMode     =   1  'UseZOrder
-   ScaleHeight     =   17535
-   ScaleWidth      =   28680
+   ScaleHeight     =   11535
+   ScaleWidth      =   17820
    WindowState     =   2  'Maximized
+   Begin VB.CommandButton cmdEDIT 
+      Caption         =   "EDIT"
+      Height          =   360
+      Left            =   16800
+      TabIndex        =   31
+      Top             =   360
+      Width           =   990
+   End
    Begin VB.TextBox externHD 
       Height          =   375
       Left            =   16440
@@ -379,6 +387,19 @@ ERR:
   MsgBox "Problem occurer during the transfer " + file
 End Function
 
+
+Private Sub cmdEDIT_Click()
+
+ Dim d() As String
+  
+   d = Split(List1.List(List1.ListIndex), ";")
+
+    frmPELATES.Lab1.Caption = "select ONOMA,DIR,RIZA,C1,C2,C3,D1,D2,D3,HME,N1,N2,N3 from PELATES "
+
+frmPELATES.Show 1
+
+FORTOSI
+End Sub
 
 Private Sub cmdMoveRecent_Click()
 List2.Visible = True
@@ -820,6 +841,7 @@ End Sub
 
 
 Sub FORTOSI()
+On Error GoTo PROBL
 
 List1.Clear
 
@@ -828,14 +850,30 @@ Dim R As Recordset
 ' Set db = OpenDatabase(App.Path + "\pelatesbackup.MDB")
 Set db = OpenDatabase("c:\backups2\pelatesbackup.MDB")
 
-Set R = db.OpenRecordset("SELECT * FROM pelates order by ONOMA")
+Set R = db.OpenRecordset("SELECT *  FROM pelates order by ONOMA")
 R.MoveFirst
 Do While Not R.EOF
-   List1.AddItem Left(R("onoma") + Space(20), 20) + ";" + Left(R("dir") + Space(30), 30) + ";" + R("riza")
 
+   If IsNull(R("dir")) Then
+      MsgBox "пяобкгла сто " + R("onoma")
+       List1.AddItem Left(R("onoma") + Space(20), 20) + ";"
+   Else
+      List1.AddItem Left(R("onoma") + Space(20), 20) + ";" + Left(R("dir") + Space(30), 30) + ";" + R("riza")
+   End If
+   
     R.MoveNext
 
 Loop
+
+
+Exit Sub
+
+PROBL:
+
+MsgBox "пяобкгла сто " + R("onoma")
+Resume Next
+
+
 
 End Sub
 
