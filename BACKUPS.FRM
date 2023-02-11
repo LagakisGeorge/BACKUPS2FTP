@@ -13,6 +13,34 @@ Begin VB.Form kyria
    ScaleHeight     =   11535
    ScaleWidth      =   17820
    WindowState     =   2  'Maximized
+   Begin VB.CommandButton cmdCommand13 
+      Caption         =   "Command13"
+      Height          =   360
+      Left            =   9720
+      TabIndex        =   33
+      Top             =   120
+      Width           =   990
+   End
+   Begin MSComctlLib.ListView ListView2 
+      Height          =   7455
+      Left            =   5280
+      TabIndex        =   32
+      Top             =   240
+      Width           =   2895
+      _ExtentX        =   5106
+      _ExtentY        =   13150
+      View            =   3
+      LabelEdit       =   1
+      LabelWrap       =   -1  'True
+      HideSelection   =   0   'False
+      HideColumnHeaders=   -1  'True
+      _Version        =   393217
+      ForeColor       =   -2147483640
+      BackColor       =   -2147483643
+      BorderStyle     =   1
+      Appearance      =   1
+      NumItems        =   0
+   End
    Begin VB.CommandButton cmdEDIT 
       Caption         =   "EDIT"
       Height          =   360
@@ -156,7 +184,7 @@ Begin VB.Form kyria
       Left            =   270
       TabIndex        =   16
       Top             =   225
-      Width           =   7995
+      Width           =   4875
    End
    Begin VB.CommandButton Command7 
       Caption         =   "φορτωση πίνακα"
@@ -387,6 +415,11 @@ ERR:
   MsgBox "Problem occurer during the transfer " + file
 End Function
 
+
+Private Sub cmdCommand13_Click()
+    ColorListviewRow ListView1, 2, vbRed
+    
+End Sub
 
 Private Sub cmdEDIT_Click()
 
@@ -753,7 +786,7 @@ End Sub
 
 Private Sub taxinomisi(ByVal gfolder As String, ByVal riza As String)
 
-Dim fdate, fsize, SearchName, f, itmx, thisExtn, ddate
+Dim fdate, fsize, SearchName, f, itmX, thisExtn, ddate
 
 
 'gfolder = "c:\mercvb"
@@ -774,15 +807,15 @@ Do While f <> ""
             fdate = FileDateTime(Trim(gfolder) & "\" & f)
             
     fsize = FileLen(Trim(gfolder) & "\" & f)
-    Set itmx = ListView1.ListItems.Add(, , f)
+    Set itmX = ListView1.ListItems.Add(, , f)
    ' ListView1.SelectedItem.Width = 100
 
-      itmx.SubItems(1) = UCase(thisExtn)
-      itmx.SubItems(2) = fdate
-      itmx.SubItems(3) = Format(Round(fsize / 1024 / 1000, 2), "0000.00")
-      itmx.SubItems(4) = Format(fsize, "0000000000")
-      itmx.SubItems(5) = Format(fdate, "YYYYMMDDHhNnSs")
-    Set itmx = Nothing
+      itmX.SubItems(1) = UCase(thisExtn)
+      itmX.SubItems(2) = fdate
+      itmX.SubItems(3) = Format(Round(fsize / 1024 / 1000, 2), "0000.00")
+      itmX.SubItems(4) = Format(fsize, "0000000000")
+      itmX.SubItems(5) = Format(fdate, "YYYYMMDDHhNnSs")
+    Set itmX = Nothing
     
      f = Dir()
             If f = "" Then
@@ -852,6 +885,8 @@ Set db = OpenDatabase("c:\backups2\pelatesbackup.MDB")
 
 Set R = db.OpenRecordset("SELECT *  FROM pelates order by ONOMA")
 R.MoveFirst
+
+Dim itmX
 Do While Not R.EOF
 
    If IsNull(R("dir")) Then
@@ -859,7 +894,27 @@ Do While Not R.EOF
        List1.AddItem Left(R("onoma") + Space(20), 20) + ";"
    Else
       List1.AddItem Left(R("onoma") + Space(20), 20) + ";" + Left(R("dir") + Space(30), 30) + ";" + R("riza")
+   
+   
+   
+   
+   
+     Set itmX = ListView2.ListItems.Add(, , R("onoma"))
+         itmX.SubItems(1) = UCase(R("dir"))
+         itmX.SubItems(2) = R("riza")
+     Set itmX = Nothing
+   
+   
    End If
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
     R.MoveNext
 
@@ -913,7 +968,7 @@ Dim maxSize As Single
 
 Dim mess(10) As String
 
-Dim itmx
+Dim itmX
 
 Dim deixe As Boolean
 
@@ -1431,7 +1486,7 @@ Dim maxSize As Single
 
 Dim mess(10) As String
 
-Dim itmx
+Dim itmX
 
 Dim deixe As Boolean
 
@@ -1680,6 +1735,46 @@ Shell "C:\Program Files\WinRAR\WINRAR.EXE " + Trim(d(1)) + "\" + Item, vbNormalF
 
 End Sub
 
+
+
+Public Sub ColorListviewRow(lv As ListView, RowNbr As Long, RowColor As OLE_COLOR)
+'***************************************************************************
+'Purpose: Color a ListView Row
+'Inputs : lv - The ListView
+'         RowNbr - The index of the row to be colored
+'         RowColor - The color to color it
+'Outputs: None
+'***************************************************************************
+    
+    Dim itmX As ListItem
+    Dim lvSI As ListSubItem
+    Dim intIndex As Integer
+    
+    On Error GoTo ErrorRoutine
+    
+    Set itmX = lv.ListItems(RowNbr)
+    itmX.ForeColor = RowColor
+    For intIndex = 1 To lv.ColumnHeaders.Count - 1
+        Set lvSI = itmX.ListSubItems(intIndex)
+        lvSI.ForeColor = RowColor
+        lvSI.Bold = True
+    Next
+ 
+    Set itmX = Nothing
+    Set lvSI = Nothing
+    
+    Exit Sub
+ 
+ErrorRoutine:
+ 
+    MsgBox ERR.Description
+ 
+End Sub
+
+
+
+
+
 Private Sub logfile_Click()
   Shell "C:\Program Files\Microsoft Office\OFFICE11\excel.exe " + f_logfile, vbMaximizedFocus
 End Sub
@@ -1700,7 +1795,7 @@ Dim maxSize As Single
 
 Dim mess(10) As String
 
-Dim itmx
+Dim itmX
 
 Dim deixe As Boolean
 
@@ -1838,7 +1933,7 @@ Dim maxSize As Single
 
 Dim mess(10) As String
 
-Dim itmx
+Dim itmX
 
 Dim deixe As Boolean
 
